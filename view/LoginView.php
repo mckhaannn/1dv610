@@ -71,6 +71,7 @@ class LoginView {
 	//CREATE GET-FUNCTIONS TO FETCH REQUEST VARIABLES
 	private function getRequestUserName() {
 		//RETURN REQUEST VARIABLE: USERNAME
+		var_dump($_REQUEST[self::$name]);
 		return $_REQUEST[self::$name];
 	}
 	
