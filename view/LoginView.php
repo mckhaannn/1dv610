@@ -78,18 +78,28 @@ class LoginView {
 		return '<a href="?register">Register a new</a>';
 	}
 
-	public function validatePassword() : bool {
+	 /** 
+		* Validates the username
+		* 
+		* @return bool
+	  */
+	public function validateUsername() : bool {
 		return isset($_POST[self::$name]) && !empty($_POST[self::$name]);
 	}
-	public function validateUsername() : bool {
+	/**
+	 * Validates the password
+	 * 
+	 * @return bool 
+	 */
+	public function validatePassword() : bool {
 		return isset($_POST[self::$password]) && !empty($_POST[self::$password]);
 	}
 	
 	//CREATE GET-FUNCTIONS TO FETCH REQUEST VARIABLES
-	private function getRequestUserName() {
+	public function getRequestUserName() {
 		return $_POST[self::$name];
 	}
-	private function getRequestPassword() {
+	public function getRequestPassword() {
 		return $_POST[self::$password];
 	}
 }
