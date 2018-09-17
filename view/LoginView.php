@@ -1,6 +1,8 @@
 <?php
+namespace view;
 
-require_once('controller/LoginController.php');
+// require_once('controller/LoginController.php');
+
 
 class LoginView {
 	private static $login = 'LoginView::Login';
@@ -25,20 +27,8 @@ class LoginView {
 		
 		$response = $this->generateLoginFormHTML($message);
 		
-		$loginController = new LoginController();
-		if(!empty($_POST[self::$login])) {
-			try {
-				$loginController->checkCredentials($this->getRequestUserName(),$this->getRequestPassword());
-			}
-			catch(Exception $e)	 {
-				// echo $e->getMessage();
-				 $_POST[self::$messageId] = $e->getMessage();
-				 echo $_GET[self::$messageId];
-				//  $message = $this->getRequestMessage();
-				// echo $message;
-			}
-		
-		}
+		// $loginController = new LoginController();
+
 		// $response .= $this->generateLogoutButtonHTML($message);
 		return $response;
 	}
@@ -82,22 +72,25 @@ class LoginView {
 		</fieldset>
 			</form>
 			';
-		}
+	}
 		
-		public function registerUser() {
-			return '<a href="?register">Register a new</a>';
-		}
-		
-		//CREATE GET-FUNCTIONS TO FETCH REQUEST VARIABLES
-		private function getRequestUserName() {
-		if(isset($_POST[self::$name])) {
-			return $_POST[self::$name];
-		}
+	public function registerUser() {
+		return '<a href="?register">Register a new</a>';
+	}
+
+	public function validatePassword() : bool {
+		return isset($_POST[self::$name]) && !empty($_POST[self::$name]);
+	}
+	public function validateUsername() : bool {
+		return isset($_POST[self::$password]) && !empty($_POST[self::$password]);
+	}
+	
+	//CREATE GET-FUNCTIONS TO FETCH REQUEST VARIABLES
+	private function getRequestUserName() {
+		return $_POST[self::$name];
 	}
 	private function getRequestPassword() {
-		if(isset($_POST[self::$password])) {
-			return $_POST[self::$password];
-		}
+		return $_POST[self::$password];
 	}
 }
 

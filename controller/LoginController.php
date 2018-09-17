@@ -1,21 +1,31 @@
 <?php
 
+namespace controller;
+
+
 class LoginController {
 
+  private $view;
+
+  public function __construct(\view\LoginView $view) {
+    $this->view = $view; 
+  }
+  
   /**
    * 
    * check if username or passor is enterd
    *  @throws Exeption if username or password is missing
    */
-  public static function checkCredentials($name, $password) {
-
-    if(empty($name)) {
-      throw new Exception('Username is missing');
-    } else if(empty($password)) {
-      throw new Exception('Password is missing');
-    } else {
-      echo $name . $password;
+  public function checkCredentials() {
+    // $this->view->response();
+    var_dump($this->view->validateUsername());
+    var_dump($this->view->validatePassword());
+    if($this->view->validateUsername() && $this->view->validatePassword()) {
+      // echo $this->view->getRequestUserName();
     }
-  
+  }
+
+  public function renderResponse() {
+    return $this->view->response();
   }
 }

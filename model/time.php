@@ -1,5 +1,6 @@
 <?php 
 
+namespace model;
 /**
  * Returns the current time of the day
  * 
