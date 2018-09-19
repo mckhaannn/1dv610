@@ -1,9 +1,6 @@
 <?php
 namespace view;
-
-// require_once('controller/LoginController.php');
-
-
+use Exception;
 class LoginView {
 	private static $login = 'LoginView::Login';
 	private static $logout = 'LoginView::Logout';
@@ -13,7 +10,12 @@ class LoginView {
 	private static $cookiePassword = 'LoginView::CookiePassword';
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
-	
+	private $exeption;
+
+	public function __construct(\model\ExeptionModel $exeption)
+	{		
+		$this->exeption = $exeption;
+	}
 
 	/**
 	 * Create HTTP response
@@ -23,13 +25,16 @@ class LoginView {
 	 * @return  void BUT writes to standard output and cookies!
 	 */
 	public function response() {
-		$message = '';
-		
+		$message = '';		
+		if(!empty($_POST[self::$login])) {
+			try {
+				$this->exeption->chechExeptionsUsername($this->getRequestUserName());
+			} catch (Exception $e) {
+				$message = $e->getMessage();
+			}
+		}
 		$response = $this->generateLoginFormHTML($message);
-		
-		// $loginController = new LoginController();
-
-		// $response .= $this->generateLogoutButtonHTML($message);
+		$response .= $this->generateLogoutButtonHTML($message);
 		return $response;
 	}
 	
@@ -74,8 +79,15 @@ class LoginView {
 			';
 	}
 		
-	public function registerUser() {
+	public function generateRegisterUserLink() {
+		if(isset($_GET['register'])) {
+			return '<a href="?">Back to login</a>';
+		}
 		return '<a href="?register">Register a new</a>';
+	}
+
+	public function lookForGet() : bool {
+		return isset($_GET['register']);
 	}
 
 	 /** 

@@ -1,17 +1,28 @@
 <?php
 
 namespace model;
-include_once('includes/dbh.inc.php');
+
 class LoginModel {
 
+
+  private $status;
+
   public function authenticate($name, $password) {
+    include('db.php');
+    $match = $connection->prepare("SELECT * FROM users WHERE name=:name LIMIT 1");
+    $match->bindParam(':name', $name);
+    $match->execute();
+    $results = $match->fetch();
 
-    $sql = "SELECT * FROM Users;";
-    $result = mysqli_query($conn, $sql);
-    $result = mysqli_num_rows($result);
-
-    if($resultCheck > 0) {
-      while(true);
+    if(count($results) > 0 && password_verify($password, $results['password'])) {
+      $this->status = true;
+      } else {
+      $this->status = false;
     }
   }
+  public function getStatus() {
+    return $this->status;
+  }
+
 }
+
