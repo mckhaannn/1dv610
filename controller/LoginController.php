@@ -9,12 +9,14 @@ class LoginController {
   private $credentialManager;
   private $registerView;
   private $registerModel;
+  private $sessionModel;
 
-  public function __construct(\view\LoginView $view, \model\LoginModel $credentialManager, \view\RegisterView $registerView, \model\RegisterUserModel $registerModel) {
+  public function __construct(\view\LoginView $view, \model\LoginModel $credentialManager, \view\RegisterView $registerView, \model\RegisterUserModel $registerModel, \model\SessionModel $sessionModel) {
     $this->view = $view; 
     $this->registerView = $registerView; 
     $this->credentialManager = $credentialManager;
     $this->registerModel = $registerModel;
+    $this->sessionModel = $sessionModel;
   }
   
 
@@ -32,14 +34,19 @@ class LoginController {
    */
   private function checkCredentials() {
     if($this->view->validateUsername() && $this->view->validatePassword()) {
-      $this->credentialManager->authenticate($this->view->getRequestUserName(), $this->view->getRequestPassword());
+      if($this->credentialManager->checkUsename($this->view->getRequestUserName())){
+        $this->credentialManager->authenticate($this->view->getRequestUserName(), $this->view->getRequestPassword());
+        $this->sessionModel->createSession($this->view->getRequestUserName());
+      }
     }
   }
 
   private function registerUserToDb() {
     if($this->registerView->validateUsername() && $this->registerView->validatePassword()) {
-      $this->registerModel->ReciveUsernameAndHashPassword($this->registerView->getRequestRegisterUsername(), $this->registerView->getRequestRegisterPassword());
-      $this->registerModel->addUserToDb();
+      $this->registerModel->ReciveUsernameAndPassword($this->registerView->getRequestRegisterUsername(), $this->registerView->getRequestRegisterPassword(), $this->registerView->getRequestRegisterRepeatPassword());
+      if($this->registerModel->passwordsMatch() && $this->registerModel->checkUsename() &&  $this->registerModel->checkUsernameLenght()) {
+        $this->registerModel->addUserToDb();
+      }
     }
   }
 
@@ -54,11 +61,16 @@ class LoginController {
   public function renderResponse() {
     if($this->view->lookForGet()) {
       return $this->registerView->response();
-    } else {
+    } else if ($this->registerModel->getRegisterStatus()) {
       return $this->view->response();
+    } else  {
+      return $this->view->response(); 
     }
   }
+
   public function registerLink() {
-    return $this->view->generateRegisterUserLink();
+    if(!$this->credentialManager->getStatus()) {
+      return $this->view->generateRegisterUserLink();  
+    }
   }
 }

@@ -4,10 +4,20 @@ namespace view;
 
 class RegisterView {
   private static $register = 'RegisterUser::register';
-  private static $messageId = 'LoginView::Message';
-	private static $regName = 'LoginView::UserName';
-	private static $regPassword = 'LoginView::Password';
-  
+  private static $messageId = 'RegisterView::Message';
+	private static $name = 'RegisterView::UserName';
+	private static $password = 'RegisterView::Password';
+	private static $passwordRepeate = 'RegisterView::PasswordRepeat';
+	private $exception;
+	private $rum;
+
+	public function __construct(\model\ExceptionModel $exception, \model\RegisterUserModel $rum)
+	{
+		$this->exception = $exception;
+		$this->rum = $rum;
+	}
+
+
 
 	/**
 	 * Create HTTP response
@@ -19,27 +29,40 @@ class RegisterView {
 	public function response() {
 		$message = '';
 		if(isset($_POST[self::$register])) {
+			$message = $this->printMessages();
 		}
 		$response = $this->generateRegisterForm($message);
 		return $response;
 	}
 
-
+	public function printMessages(){
+		$mess = null;
+		$arr = $this->exception->registerCheck($this->getRequestRegisterUsername(), $this->getRequestRegisterPassword(), $this->getRequestRegisterRepeatPassword(), $this->rum->getRegisterStatus(), $this->rum->checkUsename());
+		foreach($arr as $value) {
+			$mess .= $value . '<br>';
+		}
+		return $mess;
+	}
+	public function saveUsername() {
+		if(isset($_POST[self::$name])) {
+			return $_POST[self::$name];
+		}
+	}
   
   public function generateRegisterForm($message) {
     return '
     <form method="post" > 
       <fieldset>
-        <legend>Login - enter Username and password</legend>
+        <legend>Register a new user - Write username and password</legend>
         <p id="' . self::$messageId . '">' . $message . '</p>
-        <label for="' . self::$regName . '">Username :</label>
-					<input type="text" id="' . self::$regName . '" name="' . self::$regName . '" value="" />
+        <label for="' . self::$name . '">Username :</label>
+					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="' . $this->saveUsername() . '" />
 
-					<label for="' . self::$regPassword . '">Password :</label>
-          <input type="password" id="' . self::$regPassword . '" name="' . self::$regPassword . '" />
+					<label for="' . self::$password . '">Password :</label>
+          <input type="password" id="' . self::$password . '" name="' . self::$password . '" />
           
-					<label for="' . self::$regPassword . '">Repete Password :</label>
-					<input type="password" id="' . self::$regPassword . '" name="' . self::$regPassword . '" />
+					<label for="' . self::$passwordRepeate . '">Repeate Password :</label>
+					<input type="password" id="' . self::$passwordRepeate . '" name="' . self::$passwordRepeate . '" />
 					
 					<input type="submit" name="' . self::$register . '" value="register" />
       </fieldset>
@@ -53,21 +76,29 @@ class RegisterView {
 	* @return bool
 	*/
 	public function validateUsername() : bool {
-		return isset($_POST[self::$regName]) && !empty($_POST[self::$regName]);
+		return isset($_POST[self::$name]) && !empty($_POST[self::$name]);
 	}
-	/**
+
+	public function lookForPost() : bool {
+		return isset($_GET['register']);
+	}
+	/** 
 	 * Validates the password
 	 * 
 	 * @return bool 
-	 */
+	 */ 
+
 	public function validatePassword() : bool {
-		return isset($_POST[self::$regPassword]) && !empty($_POST[self::$regPassword]);
+		return isset($_POST[self::$password]) && !empty($_POST[self::$password]);
 	}
 
   public function getRequestRegisterUsername() {
-		return $_POST[self::$regName];
+		return $_POST[self::$name];
 	}
 	public function getRequestRegisterPassword() {
-		return $_POST[self::$regPassword];
+		return $_POST[self::$password];
+	}
+	public function getRequestRegisterRepeatPassword() {
+		return $_POST[self::$passwordRepeate];
 	}
 }

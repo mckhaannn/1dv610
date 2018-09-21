@@ -10,11 +10,13 @@ class LoginView {
 	private static $cookiePassword = 'LoginView::CookiePassword';
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
-	private $exeption;
+	private static $sessionUser = 'LoginView::SessionUser';
+	private $exception;
 
-	public function __construct(\model\ExeptionModel $exeption)
+	public function __construct(\model\ExceptionModel $exception, \model\LoginModel $loginModel)
 	{		
-		$this->exeption = $exeption;
+		$this->exception = $exception;
+		$this->loginModel = $loginModel;
 	}
 
 	/**
@@ -27,15 +29,19 @@ class LoginView {
 	public function response() {
 		$message = '';		
 		if(!empty($_POST[self::$login])) {
-			try {
-				$this->exeption->chechExeptionsUsername($this->getRequestUserName());
-			} catch (Exception $e) {
-				$message = $e->getMessage();
-			}
+			$message = $this->printMessages();
+		}
+		if(isset($_POST[self::$logout])) {
+			$message = 'Bye bye!';
+			$response = $this->generateLoginFormHTML($message);
 		}
 		$response = $this->generateLoginFormHTML($message);
-		$response .= $this->generateLogoutButtonHTML($message);
-		return $response;
+		if($this->loginModel->getStatus()) {
+			$response = $this->generateLogoutButtonHTML($message);
+			return $response;
+		} else {
+			return $response;
+		}
 	}
 	
 	/**
@@ -54,9 +60,9 @@ class LoginView {
 	
 	/**
 	 * Generate HTML code on the output buffer for the logout button
-	* @param $message, String output message
-	* @return  void, BUT writes to standard output!
-	*/
+	 * @param $message, String output message
+	 * @return  void, BUT writes to standard output!
+	 */
 	private function generateLoginFormHTML($message) {
 		return '
 		<form method="post" > 
@@ -65,36 +71,36 @@ class LoginView {
 		<p id="' . self::$messageId . '">' . $message . '</p>
 		
 		<label for="' . self::$name . '">Username :</label>
-		<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="" />
+		<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="' . $this->saveUsername() . '" />
 		
 		<label for="' . self::$password . '">Password :</label>
 		<input type="password" id="' . self::$password . '" name="' . self::$password . '" />
 		
 		<label for="' . self::$keep . '">Keep me logged in  :</label>
 		<input type="checkbox" id="' . self::$keep . '" name="' . self::$keep . '" />
-					
+		
 		<input type="submit" name="' . self::$login . '" value="login" />
 		</fieldset>
-			</form>
-			';
+		</form>
+		';
 	}
-		
-	public function generateRegisterUserLink() {
+	
+	public function generateRegisterUserLink() : string {
 		if(isset($_GET['register'])) {
 			return '<a href="?">Back to login</a>';
 		}
 		return '<a href="?register">Register a new</a>';
 	}
-
+	
 	public function lookForGet() : bool {
 		return isset($_GET['register']);
 	}
-
-	 /** 
-		* Validates the username
-		* 
-		* @return bool
-	  */
+	
+	/** 
+	 * Validates the username
+	 * 
+	 * @return bool
+	 */
 	public function validateUsername() : bool {
 		return isset($_POST[self::$name]) && !empty($_POST[self::$name]);
 	}
@@ -106,6 +112,11 @@ class LoginView {
 	public function validatePassword() : bool {
 		return isset($_POST[self::$password]) && !empty($_POST[self::$password]);
 	}
+	public function saveUsername() {
+		if(isset($_POST[self::$name])) {
+			return $_POST[self::$name];
+		}
+	}
 	
 	//CREATE GET-FUNCTIONS TO FETCH REQUEST VARIABLES
 	public function getRequestUserName() {
@@ -114,7 +125,18 @@ class LoginView {
 	public function getRequestPassword() {
 		return $_POST[self::$password];
 	}
-}
+	public function printMessages(){
+		$mess = null;
+		$arr = $this->exception->loginCheck($this->getRequestUserName(), $this->getRequestPassword(), $this->loginModel->getStatus(), $this->loginModel->checkUsename($this->getRequestUserName()), isset($_POST[self::$logout]));
+		foreach($arr as $value) {
+			$mess .= $value;
+		}
+		return $mess;
+	}
+}	
+
+// var_dump($_GET[self::$logout]);
+// var_dump($_POST[self::$logout]);
 
 // set up cookies - not completed
 // $cookie_name = "user";
@@ -122,8 +144,8 @@ class LoginView {
 // setcookie($cookie_name, $cooie_v   bvalue, time() + (86400 * 30), "/");
 
 // if(!isset($_COOKIE[$cookie_name])) {
-// 	echo "Cookie named '" . $cookie_name . "' is not set!";
-// } else {
-// 		echo "Cookie '" . $cookie_name . "' is set!<br>";
+	// 	echo "Cookie named '" . $cookie_name . "' is not set!";
+	// } else {
+		// 		echo "Cookie '" . $cookie_name . "' is set!<br>";
 // 		echo "Value is: " . $_COOKIE[$cookie_name];
 // }

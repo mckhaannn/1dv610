@@ -6,6 +6,7 @@ class LoginModel {
 
 
   private $status;
+  // private $userStatus;
 
   public function authenticate($name, $password) {
     include('db.php');
@@ -13,16 +14,28 @@ class LoginModel {
     $match->bindParam(':name', $name);
     $match->execute();
     $results = $match->fetch();
-
-    if(count($results) > 0 && password_verify($password, $results['password'])) {
+    if($results && password_verify($password, $results['password'])) {
       $this->status = true;
-      } else {
+    } else {
       $this->status = false;
     }
   }
+  
+  public function checkUsename($name) {
+    include('db.php');
+    $result = $connection->prepare("SELECT * FROM users WHERE name=:name");
+    $result->bindParam(':name', $name);
+    $result->execute();
+    $matches = $result->fetchColumn(); 
+    if($matches) {    
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public function getStatus() {
     return $this->status;
   }
-
-}
+}   
 
