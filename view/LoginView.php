@@ -31,8 +31,11 @@ class LoginView {
 		if(!empty($_POST[self::$login])) {
 			$message = $this->printMessages();
 		}
-		if(isset($_POST[self::$logout])) {
+		// var_dump(isset($_SESSION['username']));
+		if(!empty($_REQUEST[self::$logout])) {
+
 			$message = 'Bye bye!';
+
 			$response = $this->generateLoginFormHTML($message);
 		}
 		$response = $this->generateLoginFormHTML($message);
@@ -42,6 +45,12 @@ class LoginView {
 		} else {
 			return $response;
 		}
+	}
+	public function currentPage() {
+		session_start();
+		if(!isset($_SESSION['successfullRegister']));
+		$_SESSION['redurectURL'] = $_SERVER['REQUEST_URI'];
+		header('location:index.php');
 	}
 	
 	/**
@@ -86,10 +95,10 @@ class LoginView {
 	}
 	
 	public function generateRegisterUserLink() : string {
-		if(isset($_GET['register'])) {
+		if($this->lookForGet()) {
 			return '<a href="?">Back to login</a>';
 		}
-		return '<a href="?register">Register a new</a>';
+		return '<a href="?register">Register a new user</a>';
 	}
 	
 	public function lookForGet() : bool {

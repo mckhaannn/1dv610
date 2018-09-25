@@ -22,7 +22,7 @@ class RegisterUserModel {
   public function ReciveUsernameAndPassword($username, $password, $repeatPassword) {
     $this->username = $username;
     $this->password = $password;
-    $this->repeatPassword =$repeatPassword;
+    $this->repeatPassword = $repeatPassword;
   }
   
   public function passwordsMatch() {
@@ -44,8 +44,17 @@ class RegisterUserModel {
       return true;
     }
   }
+  public function removeTags() {  
+    return strip_tags($this->username);
+  }
 
-
+  public function checkIfUsernameContainsInvalidCharacters() {
+    if($this->username != strip_tags($this->username)) {
+      return false;
+    } else {
+      return true;
+    }
+  }
   
   /**
    * Creates a user on the database

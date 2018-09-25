@@ -3,7 +3,7 @@
 namespace view;
 
 class RegisterView {
-  private static $register = 'RegisterUser::register';
+  private static $register = 'RegisterView::Register';
   private static $messageId = 'RegisterView::Message';
 	private static $name = 'RegisterView::UserName';
 	private static $password = 'RegisterView::Password';
@@ -37,21 +37,32 @@ class RegisterView {
 
 	public function printMessages(){
 		$mess = null;
-		$arr = $this->exception->registerCheck($this->getRequestRegisterUsername(), $this->getRequestRegisterPassword(), $this->getRequestRegisterRepeatPassword(), $this->rum->getRegisterStatus(), $this->rum->checkUsename());
+		$arr = $this->exception->registerCheck($this->getRequestRegisterUsername(), $this->getRequestRegisterPassword(), $this->getRequestRegisterRepeatPassword(), $this->rum->getRegisterStatus(), $this->rum->checkUsename(), $this->rum->checkIfUsernameContainsInvalidCharacters());
 		foreach($arr as $value) {
 			$mess .= $value . '<br>';
 		}
 		return $mess;
 	}
 	public function saveUsername() {
-		if(isset($_POST[self::$name])) {
+		if(!$this->rum->checkIfUsernameContainsInvalidCharacters()) {
+			return $this->rum->removeTags();
+		} else if(isset($_POST[self::$name])) {
 			return $_POST[self::$name];
+		}
+	}
+	public function redirectToLogin() {
+		session_start();
+		if(isset($_POST[self::$register])) {
+			if($this->rum->getRegisterStatus()) {
+				$_SESSION['successfullRegister'] = TRUE;
+				header("location:" . $_SESSION['redurectURL']);
+			}
 		}
 	}
   
   public function generateRegisterForm($message) {
     return '
-    <form method="post" > 
+    <form action="?register" method="post" > 
       <fieldset>
         <legend>Register a new user - Write username and password</legend>
         <p id="' . self::$messageId . '">' . $message . '</p>
@@ -64,7 +75,7 @@ class RegisterView {
 					<label for="' . self::$passwordRepeate . '">Repeate Password :</label>
 					<input type="password" id="' . self::$passwordRepeate . '" name="' . self::$passwordRepeate . '" />
 					
-					<input type="submit" name="' . self::$register . '" value="register" />
+					<input type="submit" name="' . self::$register . '" value="Register" />
       </fieldset>
     </form>
     ';
@@ -80,7 +91,7 @@ class RegisterView {
 	}
 
 	public function lookForPost() : bool {
-		return isset($_GET['register']);
+		return isset($_POST['register']);
 	}
 	/** 
 	 * Validates the password

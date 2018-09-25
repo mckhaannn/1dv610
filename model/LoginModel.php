@@ -5,7 +5,7 @@ namespace model;
 class LoginModel {
 
 
-  private $status;
+  private $status = false;
   // private $userStatus;
 
   public function authenticate($name, $password) {

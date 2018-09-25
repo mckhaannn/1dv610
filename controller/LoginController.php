@@ -37,6 +37,7 @@ class LoginController {
       if($this->credentialManager->checkUsename($this->view->getRequestUserName())){
         $this->credentialManager->authenticate($this->view->getRequestUserName(), $this->view->getRequestPassword());
         $this->sessionModel->createSession($this->view->getRequestUserName());
+        $this->view->redirectToLogin();
       }
     }
   }
@@ -44,7 +45,7 @@ class LoginController {
   private function registerUserToDb() {
     if($this->registerView->validateUsername() && $this->registerView->validatePassword()) {
       $this->registerModel->ReciveUsernameAndPassword($this->registerView->getRequestRegisterUsername(), $this->registerView->getRequestRegisterPassword(), $this->registerView->getRequestRegisterRepeatPassword());
-      if($this->registerModel->passwordsMatch() && $this->registerModel->checkUsename() &&  $this->registerModel->checkUsernameLenght()) {
+      if($this->registerModel->passwordsMatch() && $this->registerModel->checkUsename() &&  $this->registerModel->checkUsernameLenght() && $this->registerModel->checkIfUsernameContainsInvalidCharacters()) {
         $this->registerModel->addUserToDb();
       }
     }
@@ -61,9 +62,7 @@ class LoginController {
   public function renderResponse() {
     if($this->view->lookForGet()) {
       return $this->registerView->response();
-    } else if ($this->registerModel->getRegisterStatus()) {
-      return $this->view->response();
-    } else  {
+    } else if ($this->view->lookForGet() == false)  {
       return $this->view->response(); 
     }
   }

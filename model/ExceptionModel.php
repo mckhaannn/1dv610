@@ -30,7 +30,7 @@ class ExceptionModel {
    * 
    * @return array
    */
-  public function registerCheck($username, $password, $repeatePassword, $status, $statement) {
+  public function registerCheck($username, $password, $repeatePassword, $status, $statement, $usernameStatus) {
     $messages = array();
     if(strlen($username) < 3) {
       array_push($messages, "Username has too few characters, at least 3 characters.");
@@ -44,11 +44,13 @@ class ExceptionModel {
     if($status) {
       array_push($messages, "Registered new user.");
     }
-    if(!$statement) {
+    if(!$statement && !$status) {
       array_push($messages, "User exists, pick another username.");
     }
+    if(!$usernameStatus) {
+      array_push($messages, "Username contains invalid characters.");
+    } 
     return $messages;
-    unset($messages);
   }
 
 }

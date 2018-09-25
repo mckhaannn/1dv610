@@ -28,5 +28,8 @@ $dtv = new \view\DateTimeView();
 $lv = new \view\LayoutView();
 
 $lc->registerOrCheckUser();
+if($v->lookForGet()) {
+  $rw->response();
+}
 $lv->render($lc->getLoggedInStatus(), $lc, $dtv);
 

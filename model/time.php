@@ -8,7 +8,7 @@ namespace model;
  */
 function getTime() {
 
-  date_default_timezone_get('Europe/Stockholm');
+  date_default_timezone_set('Europe/Stockholm');
 
   $time = getDate();
 
