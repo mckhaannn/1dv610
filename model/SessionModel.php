@@ -9,4 +9,7 @@ class SessionModel {
     session_start();
     $_SESSION['username'] = $username;
   }
+  public function setMessage($message) {
+    $_SESSION['message'] = $message;
+  }
 }

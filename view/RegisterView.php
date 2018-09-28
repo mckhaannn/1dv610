@@ -50,15 +50,6 @@ class RegisterView {
 			return $_POST[self::$name];
 		}
 	}
-	public function redirectToLogin() {
-		session_start();
-		if(isset($_POST[self::$register])) {
-			if($this->rum->getRegisterStatus()) {
-				$_SESSION['successfullRegister'] = TRUE;
-				header("location:" . $_SESSION['redurectURL']);
-			}
-		}
-	}
   
   public function generateRegisterForm($message) {
     return '

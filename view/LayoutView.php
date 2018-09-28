@@ -4,7 +4,17 @@ namespace view;
 
 class LayoutView {
   
+
+  private function response() {
+    if($this->lc->registerStatus()) {
+      return $this->lc->returnToLogin();
+    } else {
+      return $this->lc->renderResponse();
+    }
+  }
+  
   public function render($isLoggedIn, \controller\LoginController $lc, \view\DateTimeView $dtv) {
+    $this->lc = $lc;  
     echo '<!DOCTYPE html>
       <html>
         <head>
@@ -16,7 +26,7 @@ class LayoutView {
           ' . $lc->registerLink() . '
           ' . $this->renderIsLoggedIn($isLoggedIn) . '
           <div class="container">
-              ' . $lc->renderResponse() . '
+              ' . $this->response() . '
               ' . $dtv->show() . '
           </div>
          </body>

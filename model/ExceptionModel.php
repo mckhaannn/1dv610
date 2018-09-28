@@ -9,7 +9,7 @@ class ExceptionModel {
    * 
    * @return array
    */
-  public function loginCheck($username, $password, $status, $userstatus, $logout) { 
+  public function loginCheck($username, $password, $status, $userstatus, $registerStatus) { 
     $messages = array();
     if(empty($username)) {
       array_push($messages, "Username is missing");
@@ -19,8 +19,8 @@ class ExceptionModel {
       array_push($messages, "Welcome");
     } else if($userstatus) {
       array_push($messages, "Wrong name or password");
-    } else if ($logout) {
-      array_push($messages, "Bye bye!");
+    } else if($registerStatus) {
+      array_push($messages, "Registered new user.");
     }
     return $messages; 
   }
@@ -41,15 +41,15 @@ class ExceptionModel {
     if(strlen($password) < 6) {
       array_push($messages, "Password has too few characters, at least 6 characters.");
     }
-    if($status) {
-      array_push($messages, "Registered new user.");
-    }
     if(!$statement && !$status) {
       array_push($messages, "User exists, pick another username.");
     }
     if(!$usernameStatus) {
       array_push($messages, "Username contains invalid characters.");
     } 
+    if($status) {
+      array_push($messages, "Registered new user.");
+    }
     return $messages;
   }
 

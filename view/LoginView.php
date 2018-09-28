@@ -13,10 +13,11 @@ class LoginView {
 	private static $sessionUser = 'LoginView::SessionUser';
 	private $exception;
 
-	public function __construct(\model\ExceptionModel $exception, \model\LoginModel $loginModel)
+	public function __construct(\model\ExceptionModel $exception, \model\LoginModel $loginModel, \model\RegisterUserModel $registerModel)
 	{		
 		$this->exception = $exception;
 		$this->loginModel = $loginModel;
+		$this->registerModel = $registerModel;
 	}
 
 	/**
@@ -30,6 +31,11 @@ class LoginView {
 		$message = '';		
 		if(!empty($_POST[self::$login])) {
 			$message = $this->printMessages();
+		}
+		if(isset($_SESSION['message'])) {
+			$message = 'Registered new user.';
+			$response = $this->generateLoginFormHTML($message);
+			
 		}
 		// var_dump(isset($_SESSION['username']));
 		if(!empty($_REQUEST[self::$logout])) {
@@ -46,12 +52,7 @@ class LoginView {
 			return $response;
 		}
 	}
-	public function currentPage() {
-		session_start();
-		if(!isset($_SESSION['successfullRegister']));
-		$_SESSION['redurectURL'] = $_SERVER['REQUEST_URI'];
-		header('location:index.php');
-	}
+
 	
 	/**
 	 * Generate HTML code on the output buffer for the logout button
@@ -124,6 +125,8 @@ class LoginView {
 	public function saveUsername() {
 		if(isset($_POST[self::$name])) {
 			return $_POST[self::$name];
+		} else if(isset($_SESSION['username'])) {
+			return $_SESSION['username'];
 		}
 	}
 	
@@ -136,25 +139,10 @@ class LoginView {
 	}
 	public function printMessages(){
 		$mess = null;
-		$arr = $this->exception->loginCheck($this->getRequestUserName(), $this->getRequestPassword(), $this->loginModel->getStatus(), $this->loginModel->checkUsename($this->getRequestUserName()), isset($_POST[self::$logout]));
+		$arr = $this->exception->loginCheck($this->getRequestUserName(), $this->getRequestPassword(), $this->loginModel->getStatus(), $this->loginModel->checkUsename($this->getRequestUserName()), $this->registerModel->getRegisterStatus());
 		foreach($arr as $value) {
 			$mess .= $value;
 		}
 		return $mess;
 	}
 }	
-
-// var_dump($_GET[self::$logout]);
-// var_dump($_POST[self::$logout]);
-
-// set up cookies - not completed
-// $cookie_name = "user";
-// $cooie_value = "John dee";
-// setcookie($cookie_name, $cooie_v   bvalue, time() + (86400 * 30), "/");
-
-// if(!isset($_COOKIE[$cookie_name])) {
-	// 	echo "Cookie named '" . $cookie_name . "' is not set!";
-	// } else {
-		// 		echo "Cookie '" . $cookie_name . "' is set!<br>";
-// 		echo "Value is: " . $_COOKIE[$cookie_name];
-// }

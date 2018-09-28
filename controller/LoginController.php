@@ -37,7 +37,6 @@ class LoginController {
       if($this->credentialManager->checkUsename($this->view->getRequestUserName())){
         $this->credentialManager->authenticate($this->view->getRequestUserName(), $this->view->getRequestPassword());
         $this->sessionModel->createSession($this->view->getRequestUserName());
-        $this->view->redirectToLogin();
       }
     }
   }
@@ -47,6 +46,9 @@ class LoginController {
       $this->registerModel->ReciveUsernameAndPassword($this->registerView->getRequestRegisterUsername(), $this->registerView->getRequestRegisterPassword(), $this->registerView->getRequestRegisterRepeatPassword());
       if($this->registerModel->passwordsMatch() && $this->registerModel->checkUsename() &&  $this->registerModel->checkUsernameLenght() && $this->registerModel->checkIfUsernameContainsInvalidCharacters()) {
         $this->registerModel->addUserToDb();
+        $this->sessionModel->createSession($this->registerView->getRequestRegisterUsername());
+        $this->sessionModel->setMessage('Registered new user.');
+
       }
     }
   }
@@ -54,6 +56,10 @@ class LoginController {
   public function getLoggedInStatus() {
     return $this->credentialManager->getStatus();
   }
+  public function registerStatus() {
+    return $this->registerModel->getRegisterStatus();
+  }
+
 
   /**
    * render the respons function from LoginView
@@ -64,8 +70,13 @@ class LoginController {
       return $this->registerView->response();
     } else if ($this->view->lookForGet() == false)  {
       return $this->view->response(); 
-    }
+    } 
   }
+
+  public function returnToLogin() {
+    return $this->view->response();
+  }
+  
 
   public function registerLink() {
     if(!$this->credentialManager->getStatus()) {
